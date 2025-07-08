@@ -11,4 +11,4 @@ datagroup: yj_test_default_datagroup {
 persist_with: yj_test_default_datagroup
 
 explore: sample {}
-
+explore: calculation {}

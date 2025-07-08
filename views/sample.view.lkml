@@ -16,6 +16,7 @@ view: sample {
   }
   dimension: customer_id {
     type: string
+    primary_key: yes
     sql: ${TABLE}.CustomerID ;;
   }
   dimension: customer_name {
