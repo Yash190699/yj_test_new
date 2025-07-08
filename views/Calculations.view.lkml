@@ -20,8 +20,12 @@ view: calculation {
           SUM(sample.Sales) AS total_sales,
           SUM(sample.Profit) AS total_profit,
           COUNT(sample.OrderID) As total_orders,
-          COUNT(sample.CustomerID) AS total_customers
-      FROM `New_yj.sample`  AS sample
+          COUNT(sample.CustomerID) AS total_customers,
+          EXTRACT(YEAR FROM sample.OrderDate) AS order_year,
+          EXTRACT(month FROM sample.OrderDate) AS order_month,
+          EXTRACT(quarter FROM sample.OrderDate) AS order_quarter
+
+          FROM `New_yj.sample`  AS sample
       GROUP BY
           1,
           2,
@@ -33,27 +37,35 @@ view: calculation {
           8
       ORDER BY
           1 DESC
-      LIMIT 500 ;;
+     ;;
   }
-
-
+dimension: OrderMonth {
+  type: string
+  sql: ${TABLE}.OrderMonth ;;
+}
 measure: total_customer {
-  type: number
+  type: sum
   sql: ${TABLE}.total_customers ;;
+  value_format: "0.00"
+
 }
 
 measure: total_orders {
-  type: number
+  type: sum
   sql: ${TABLE}.total_orders ;;
+  value_format: "0.00"
+
 }
 
 measure: total_profit {
-  type: number
+  type: sum
   sql: ${TABLE}.total_profit ;;
+  value_format: "0.00"
 }
 measure: total_sales {
-  type: number
+  type: sum
   sql: ${TABLE}.total_sales ;;
+  value_format: "0.00"
 }
 dimension: customer_lifetime_value_segmentation {
   type: string
@@ -77,13 +89,37 @@ measure: days_to_ship {
     type: count
     drill_fields: [detail*]
   }
-
-  dimension: sample_order_date {
-    type: date
+  dimension_group: sample_order_date {
+    type: time
     datatype: date
+    timeframes: [month, month_name, year, date, raw, time, quarter]
     sql: ${TABLE}.sample_order_date ;;
   }
-
+parameter: Select_timeframe {
+  type: unquoted
+  allowed_value: {
+    value: "Year"
+    label: "year"
+  }
+  allowed_value: {
+    value: "Month"
+    label: "Month"
+  }
+  allowed_value: {
+    value: "Quarter"
+    label: "Quarter"
+  }
+}
+dimension: order_date {
+sql:
+  {% if Select_timeframe._parameter_value == 'Year'%}
+  order_year
+  {% elsif Select_timeframe._parameter_value == 'Month'%}
+  order_month
+  {% else %}
+  order_quarter
+  {% endif %};;
+}
   dimension: sample_ship_date {
     type: date
     datatype: date
@@ -128,7 +164,7 @@ measure: days_to_ship {
 
   set: detail {
     fields: [
-      sample_order_date,
+      sample_order_date_date,
       sample_ship_date,
       sample_sales,
       sample_profit,
