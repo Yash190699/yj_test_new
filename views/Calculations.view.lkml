@@ -3,13 +3,17 @@ view: calculation {
   derived_table: {
     sql: SELECT
           (sample.OrderDate ) AS sample_order_date,
-              (sample.ShipDate ) AS sample_ship_date,
+          (sample.ShipDate ) AS sample_ship_date,
           sample.Sales  AS sample_sales,
           sample.Profit  AS sample_profit,
           sample.CustomerID  AS sample_customer_id,
           sample.OrderID  AS sample_order_id,
           sample.Category  AS sample_category,
           sample.`Sub-Category`  AS sample_subcategory,
+          sample.Country AS country,
+          sample.State AS State,
+          sample.City AS city,
+          sample.PostalCode As postalcode,
           COUNT(*) AS sample_count,
           ROUND(sample.Profit/sample.Sales,2) As Profit_ratio,
           DATE_DIFF(sample.ShipDate, sample.OrderDate, Day) AS days_to_ship,
@@ -25,6 +29,7 @@ view: calculation {
           EXTRACT(month FROM sample.OrderDate) AS order_month,
           EXTRACT(quarter FROM sample.OrderDate) AS order_quarter
 
+
           FROM `New_yj.sample`  AS sample
       GROUP BY
           1,
@@ -34,10 +39,28 @@ view: calculation {
           5,
           6,
           7,
-          8
+          8,
+          9,
+          10,
+          11,
+          12
       ORDER BY
           1 DESC
      ;;
+  }
+dimension: Country {
+  type:  string
+  map_layer_name: countries
+
+  sql: ${TABLE}.Country ;;
+}
+dimension: State {
+  type:  string
+  sql: ${TABLE}.State ;;
+  }
+dimension: City {
+  type:  string
+  sql: ${TABLE}.City ;;
   }
 dimension: OrderMonth {
   type: string
