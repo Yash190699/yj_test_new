@@ -1,5 +1,6 @@
 
 view: calculation {
+
   derived_table: {
     sql: SELECT
           (sample.OrderDate ) AS sample_order_date,
