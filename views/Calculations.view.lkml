@@ -14,6 +14,7 @@ view: calculation {
           sample.State AS State,
           sample.City AS city,
           sample.PostalCode As postalcode,
+          sample.CustomerName As CustomerName,
           COUNT(*) AS sample_count,
           ROUND(sample.Profit/sample.Sales,2) As Profit_ratio,
           DATE_DIFF(sample.ShipDate, sample.OrderDate, Day) AS days_to_ship,
@@ -43,11 +44,16 @@ view: calculation {
           9,
           10,
           11,
-          12
+          12,
+          13
       ORDER BY
           1 DESC
      ;;
   }
+dimension: CustomerName {
+  type: string
+  sql: ${TABLE}.CustomerName ;;
+}
 dimension: Country {
   type:  string
   map_layer_name: countries
