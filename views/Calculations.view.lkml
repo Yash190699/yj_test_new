@@ -1,6 +1,7 @@
 
 view: calculation {
 
+  required_access_grants: [view_calculations]
   derived_table: {
     sql: SELECT
           (sample.OrderDate ) AS sample_order_date,
