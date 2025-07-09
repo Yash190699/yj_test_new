@@ -64,7 +64,7 @@ dimension: City {
   }
 dimension: OrderMonth {
   type: string
-  sql: ${TABLE}.OrderMonth ;;
+  sql: ${TABLE}.Order_Month ;;
 }
 measure: total_customer {
   type: sum
