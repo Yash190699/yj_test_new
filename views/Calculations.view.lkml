@@ -17,6 +17,10 @@ view: calculation {
           sample.City AS city,
           sample.PostalCode As postalcode,
           sample.CustomerName As CustomerName,
+          sample.Segment AS segment,
+          sample.Quantity As quantity_sold,
+          sample.ProductName As Product_Name,
+          AVG(sample.Discount) As Discount,
           COUNT(*) AS sample_count,
           ROUND(sample.Profit/sample.Sales,2) As Profit_ratio,
           DATE_DIFF(sample.ShipDate, sample.OrderDate, Day) AS days_to_ship,
@@ -47,7 +51,10 @@ view: calculation {
           10,
           11,
           12,
-          13
+          13,
+          14,
+          15,
+          16
       ORDER BY
           1 DESC
      ;;
@@ -55,6 +62,24 @@ view: calculation {
 dimension: CustomerName {
   type: string
   sql: ${TABLE}.CustomerName ;;
+}
+dimension: Discount {
+  type: number
+  sql: ${TABLE}.Discount ;;
+}
+dimension: Product_name {
+  type: string
+  sql: ${TABLE}.Product_Name ;;
+  drill_fields: ["sample_subcategory","Discount"]
+
+}
+measure:  Quantity_sold{
+  type: sum
+  sql:  ${TABLE}.quantity_sold ;;
+}
+dimension: Segment {
+  type: string
+  sql: ${TABLE}.segment ;;
 }
 dimension: Country {
   type:  string
