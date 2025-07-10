@@ -10,7 +10,7 @@ view: calculation {
           sample.CustomerID  AS sample_customer_id,
           sample.OrderID  AS sample_order_id,
           sample.Category  AS sample_category,
-          sample.Sub-Category  AS sample_subcategory,
+          sample.`Sub-Category`  AS sample_subcategory,
           sample.Country AS country,
           sample.State AS State,
           sample.City AS city,
