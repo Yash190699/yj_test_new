@@ -20,6 +20,7 @@ view: calculation {
           sample.Segment AS segment,
           sample.Quantity As quantity_sold,
           sample.ProductName As Product_Name,
+          sample.Region As Region,
           AVG(sample.Discount) As Discount,
           COUNT(*) AS sample_count,
           ROUND(sample.Profit/sample.Sales,2) As Profit_ratio,
@@ -34,7 +35,8 @@ view: calculation {
           COUNT(sample.CustomerID) AS total_customers,
           EXTRACT(YEAR FROM sample.OrderDate) AS order_year,
           EXTRACT(month FROM sample.OrderDate) AS order_month,
-          EXTRACT(quarter FROM sample.OrderDate) AS order_quarter
+          EXTRACT(quarter FROM sample.OrderDate) AS order_quarter,
+          RANK() OVER(ORDER BY COUNT(*) DESC) as rank
 
 
           FROM `New_yj.sample`  AS sample
@@ -54,24 +56,31 @@ view: calculation {
           13,
           14,
           15,
-          16
+          16,
+          17
       ORDER BY
           1 DESC
      ;;
   }
+dimension: rank {
+  type: number
+  sql: ${TABLE}.rank ;;
+}
 dimension: CustomerName {
   type: string
   sql: ${TABLE}.CustomerName ;;
 }
-dimension: Discount {
-  type: number
+dimension: Region {
+  type: string
+  sql: ${TABLE}.Region ;;
+}
+measure: Discount {
+  type: average
   sql: ${TABLE}.Discount ;;
 }
 dimension: Product_name {
   type: string
   sql: ${TABLE}.Product_Name ;;
-  drill_fields: ["sample_subcategory","Discount"]
-
 }
 measure:  Quantity_sold{
   type: sum
@@ -80,6 +89,7 @@ measure:  Quantity_sold{
 dimension: Segment {
   type: string
   sql: ${TABLE}.segment ;;
+  drill_fields: [CustomerName,sample_customer_id,total_sales,total_profit]
 }
 dimension: Country {
   type:  string
@@ -166,6 +176,21 @@ parameter: Select_timeframe {
     label: "Quarter"
   }
 }
+parameter: Top_Products {
+  type: unquoted
+  allowed_value: {
+    value: "Top 5"
+    label: "Top5"
+  }
+  allowed_value: {
+    value: "Top 10"
+    label: "Top 10"
+  }
+  allowed_value: {
+    value: "Top 15"
+    label: "Top 15"
+  }
+}
 dimension: order_date {
 sql:
   {% if Select_timeframe._parameter_value == 'Year'%}
@@ -206,6 +231,7 @@ sql:
   dimension: sample_category {
     type: string
     sql: ${TABLE}.sample_category ;;
+    drill_fields: [sample_subcategory, total_profit, total_sales]
   }
 
   dimension: sample_subcategory {
@@ -216,6 +242,37 @@ sql:
   dimension: sample_count {
     type: number
     sql: ${TABLE}.sample_count ;;
+  }
+  measure: Same_period_last_year{
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: previous
+    period: year
+    value_format: "0.00"
+  }
+  measure: Difference_from_last_year{
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: difference
+    period: year
+    value_format: "0.00"
+
+  }
+  measure: Percent_change {
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: relative_change
+    period: year
+    value_format: "0.00%"
+
+  }
+  set: drill {
+    fields: [
+      sample_subcategory,Discount
+    ]
   }
 
   set: detail {
