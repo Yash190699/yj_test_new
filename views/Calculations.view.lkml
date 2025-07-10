@@ -1,4 +1,3 @@
-
 view: calculation {
 
   required_access_grants: [view_calculations]
@@ -11,7 +10,7 @@ view: calculation {
           sample.CustomerID  AS sample_customer_id,
           sample.OrderID  AS sample_order_id,
           sample.Category  AS sample_category,
-          sample.`Sub-Category`  AS sample_subcategory,
+          sample.Sub-Category  AS sample_subcategory,
           sample.Country AS country,
           sample.State AS State,
           sample.City AS city,
@@ -39,113 +38,113 @@ view: calculation {
           RANK() OVER(ORDER BY COUNT(*) DESC) as rank
 
 
-          FROM `New_yj.sample`  AS sample
+      FROM New_yj.sample  AS sample
       GROUP BY
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
       ORDER BY
-          1 DESC
-     ;;
+      1 DESC
+      ;;
   }
-dimension: rank {
-  type: number
-  sql: ${TABLE}.rank ;;
-}
-dimension: CustomerName {
-  type: string
-  sql: ${TABLE}.CustomerName ;;
-}
-dimension: Region {
-  type: string
-  sql: ${TABLE}.Region ;;
-}
-measure: Discount {
-  type: average
-  sql: ${TABLE}.Discount ;;
-}
-dimension: Product_name {
-  type: string
-  sql: ${TABLE}.Product_Name ;;
-}
-measure:  Quantity_sold{
-  type: sum
-  sql:  ${TABLE}.quantity_sold ;;
-}
-dimension: Segment {
-  type: string
-  sql: ${TABLE}.segment ;;
-  drill_fields: [CustomerName,sample_customer_id,total_sales,total_profit]
-}
-dimension: Country {
-  type:  string
-  map_layer_name: countries
-
-  sql: ${TABLE}.Country ;;
-}
-dimension: State {
-  type:  string
-  sql: ${TABLE}.State ;;
+  dimension: rank {
+    type: number
+    sql: ${TABLE}.rank ;;
   }
-dimension: City {
-  type:  string
-  sql: ${TABLE}.City ;;
+  dimension: CustomerName {
+    type: string
+    sql: ${TABLE}.CustomerName ;;
   }
-dimension: OrderMonth {
-  type: string
-  sql: ${TABLE}.Order_Month ;;
-}
-measure: total_customer {
-  type: sum
-  sql: ${TABLE}.total_customers ;;
-  value_format: "0.00"
+  dimension: Region {
+    type: string
+    sql: ${TABLE}.Region ;;
+  }
+  measure: Discount {
+    type: average
+    sql: ${TABLE}.Discount ;;
+  }
+  dimension: Product_name {
+    type: string
+    sql: ${TABLE}.Product_Name ;;
+  }
+  measure:  Quantity_sold{
+    type: sum
+    sql:  ${TABLE}.quantity_sold ;;
+  }
+  dimension: Segment {
+    type: string
+    sql: ${TABLE}.segment ;;
+    drill_fields: [CustomerName,sample_customer_id,total_sales,total_profit]
+  }
+  dimension: Country {
+    type:  string
+    map_layer_name: countries
 
-}
+    sql: ${TABLE}.Country ;;
+  }
+  dimension: State {
+    type:  string
+    sql: ${TABLE}.State ;;
+  }
+  dimension: City {
+    type:  string
+    sql: ${TABLE}.City ;;
+  }
+  dimension: OrderMonth {
+    type: string
+    sql: ${TABLE}.Order_Month ;;
+  }
+  measure: total_customer {
+    type: sum
+    sql: ${TABLE}.total_customers ;;
+    value_format: "0.00"
 
-measure: total_orders {
-  type: sum
-  sql: ${TABLE}.total_orders ;;
-  value_format: "0.00"
+  }
 
-}
+  measure: total_orders {
+    type: sum
+    sql: ${TABLE}.total_orders ;;
+    value_format: "0.00"
 
-measure: total_profit {
-  type: sum
-  sql: ${TABLE}.total_profit ;;
-  value_format: "0.00"
-}
-measure: total_sales {
-  type: sum
-  sql: ${TABLE}.total_sales ;;
-  value_format: "0.00"
-}
-dimension: customer_lifetime_value_segmentation {
-  type: string
-  sql: ${TABLE}.customer_lifetime_value_segmentation ;;
-}
-measure: sales_per_customer {
-  type: number
-  sql: ${TABLE}.sales_per_customer ;;
-}
+  }
 
-measure: days_to_ship {
-  type: number
-  sql: ${TABLE}.days_to_ship ;;
-}
+  measure: total_profit {
+    type: sum
+    sql: ${TABLE}.total_profit ;;
+    value_format: "0.00"
+  }
+  measure: total_sales {
+    type: sum
+    sql: ${TABLE}.total_sales ;;
+    value_format: "0.00"
+  }
+  dimension: customer_lifetime_value_segmentation {
+    type: string
+    sql: ${TABLE}.customer_lifetime_value_segmentation ;;
+  }
+  measure: sales_per_customer {
+    type: number
+    sql: ${TABLE}.sales_per_customer ;;
+  }
+
+  measure: days_to_ship {
+    type: number
+    sql: ${TABLE}.days_to_ship ;;
+  }
 
   measure: Profit_ratio {
     type: number
@@ -161,46 +160,46 @@ measure: days_to_ship {
     timeframes: [month, month_name, year, date, raw, time, quarter]
     sql: ${TABLE}.sample_order_date ;;
   }
-parameter: Select_timeframe {
-  type: unquoted
-  allowed_value: {
-    value: "Year"
-    label: "year"
+  parameter: Select_timeframe {
+    type: unquoted
+    allowed_value: {
+      value: "Year"
+      label: "year"
+    }
+    allowed_value: {
+      value: "Month"
+      label: "Month"
+    }
+    allowed_value: {
+      value: "Quarter"
+      label: "Quarter"
+    }
   }
-  allowed_value: {
-    value: "Month"
-    label: "Month"
+  parameter: Top_Products {
+    type: unquoted
+    allowed_value: {
+      value: "Top 5"
+      label: "Top5"
+    }
+    allowed_value: {
+      value: "Top 10"
+      label: "Top 10"
+    }
+    allowed_value: {
+      value: "Top 15"
+      label: "Top 15"
+    }
   }
-  allowed_value: {
-    value: "Quarter"
-    label: "Quarter"
+  dimension: order_date {
+    sql:
+      {% if Select_timeframe._parameter_value == 'Year'%}
+      order_year
+      {% elsif Select_timeframe._parameter_value == 'Month'%}
+      order_month
+      {% else %}
+      order_quarter
+      {% endif %};;
   }
-}
-parameter: Top_Products {
-  type: unquoted
-  allowed_value: {
-    value: "Top 5"
-    label: "Top5"
-  }
-  allowed_value: {
-    value: "Top 10"
-    label: "Top 10"
-  }
-  allowed_value: {
-    value: "Top 15"
-    label: "Top 15"
-  }
-}
-dimension: order_date {
-sql:
-  {% if Select_timeframe._parameter_value == 'Year'%}
-  order_year
-  {% elsif Select_timeframe._parameter_value == 'Month'%}
-  order_month
-  {% else %}
-  order_quarter
-  {% endif %};;
-}
   dimension: sample_ship_date {
     type: date
     datatype: date
