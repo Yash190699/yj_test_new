@@ -1,4 +1,3 @@
-
 view: calculation {
 
   required_access_grants: [view_calculations]
@@ -11,7 +10,7 @@ view: calculation {
           sample.CustomerID  AS sample_customer_id,
           sample.OrderID  AS sample_order_id,
           sample.Category  AS sample_category,
-          sample.`Sub-Category`  AS sample_subcategory,
+          sample.Sub-Category  AS sample_subcategory,
           sample.Country AS country,
           sample.State AS State,
           sample.City AS city,
@@ -20,6 +19,7 @@ view: calculation {
           sample.Segment AS segment,
           sample.Quantity As quantity_sold,
           sample.ProductName As Product_Name,
+          sample.Region As Region,
           AVG(sample.Discount) As Discount,
           COUNT(*) AS sample_count,
           ROUND(sample.Profit/sample.Sales,2) As Profit_ratio,
@@ -34,111 +34,117 @@ view: calculation {
           COUNT(sample.CustomerID) AS total_customers,
           EXTRACT(YEAR FROM sample.OrderDate) AS order_year,
           EXTRACT(month FROM sample.OrderDate) AS order_month,
-          EXTRACT(quarter FROM sample.OrderDate) AS order_quarter
+          EXTRACT(quarter FROM sample.OrderDate) AS order_quarter,
+          RANK() OVER(ORDER BY COUNT(*) DESC) as rank
 
 
-          FROM `New_yj.sample`  AS sample
+      FROM New_yj.sample  AS sample
       GROUP BY
-          1,
-          2,
-          3,
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
       ORDER BY
-          1 DESC
-     ;;
+      1 DESC
+      ;;
   }
-dimension: CustomerName {
-  type: string
-  sql: ${TABLE}.CustomerName ;;
-}
-measure: Discount {
-  type: average
-  sql: ${TABLE}.Discount ;;
-}
-dimension: Product_name {
-  type: string
-  sql: ${TABLE}.Product_Name ;;
-  link: {
-    url: "https://gcpl2510.cloud.looker.com/explore/yj_test/calculation?fields=calculation.sample_subcategory,calculation.Discount&limit=500&column_limit=50&vis=%7B%22x_axis_gridlines%22%3Afalse%2C%22y_axis_gridlines%22%3Atrue%2C%22show_view_names%22%3Afalse%2C%22show_y_axis_labels%22%3Atrue%2C%22show_y_axis_ticks%22%3Atrue%2C%22y_axis_tick_density%22%3A%22default%22%2C%22y_axis_tick_density_custom%22%3A5%2C%22show_x_axis_label%22%3Atrue%2C%22show_x_axis_ticks%22%3Atrue%2C%22y_axis_scale_mode%22%3A%22linear%22%2C%22x_axis_reversed%22%3Afalse%2C%22y_axis_reversed%22%3Afalse%2C%22plot_size_by_field%22%3Afalse%2C%22trellis%22%3A%22%22%2C%22stacking%22%3A%22%22%2C%22limit_displayed_rows%22%3Afalse%2C%22legend_position%22%3A%22center%22%2C%22point_style%22%3A%22none%22%2C%22show_value_labels%22%3Afalse%2C%22label_density%22%3A25%2C%22x_axis_scale%22%3A%22auto%22%2C%22y_axis_combined%22%3Atrue%2C%22ordering%22%3A%22none%22%2C%22show_null_labels%22%3Afalse%2C%22show_totals_labels%22%3Afalse%2C%22show_silhouette%22%3Afalse%2C%22totals_color%22%3A%22%23808080%22%2C%22hidden_pivots%22%3A%7B%7D%2C%22type%22%3A%22looker_column%22%2C%22defaults_version%22%3A1%7D&filter_config=%7B%7D&origin=share-expanded"
-    label: "Sub-cateogry vs Discount"
+  dimension: rank {
+    type: number
+    sql: ${TABLE}.rank ;;
+  }
+  dimension: CustomerName {
+    type: string
+    sql: ${TABLE}.CustomerName ;;
+  }
+  dimension: Region {
+    type: string
+    sql: ${TABLE}.Region ;;
+  }
+  measure: Discount {
+    type: average
+    sql: ${TABLE}.Discount ;;
+  }
+  dimension: Product_name {
+    type: string
+    sql: ${TABLE}.Product_Name ;;
+  }
+  measure:  Quantity_sold{
+    type: sum
+    sql:  ${TABLE}.quantity_sold ;;
+  }
+  dimension: Segment {
+    type: string
+    sql: ${TABLE}.segment ;;
+    drill_fields: [CustomerName,sample_customer_id,total_sales,total_profit]
+  }
+  dimension: Country {
+    type:  string
+    map_layer_name: countries
+
+    sql: ${TABLE}.Country ;;
+  }
+  dimension: State {
+    type:  string
+    sql: ${TABLE}.State ;;
+  }
+  dimension: City {
+    type:  string
+    sql: ${TABLE}.City ;;
+  }
+  dimension: OrderMonth {
+    type: string
+    sql: ${TABLE}.Order_Month ;;
+  }
+  measure: total_customer {
+    type: sum
+    sql: ${TABLE}.total_customers ;;
+    value_format: "0.00"
+
   }
 
-}
-measure:  Quantity_sold{
-  type: sum
-  sql:  ${TABLE}.quantity_sold ;;
-}
-dimension: Segment {
-  type: string
-  sql: ${TABLE}.segment ;;
-}
-dimension: Country {
-  type:  string
-  map_layer_name: countries
+  measure: total_orders {
+    type: sum
+    sql: ${TABLE}.total_orders ;;
+    value_format: "0.00"
 
-  sql: ${TABLE}.Country ;;
-}
-dimension: State {
-  type:  string
-  sql: ${TABLE}.State ;;
   }
-dimension: City {
-  type:  string
-  sql: ${TABLE}.City ;;
+
+  measure: total_profit {
+    type: sum
+    sql: ${TABLE}.total_profit ;;
+    value_format: "0.00"
   }
-dimension: OrderMonth {
-  type: string
-  sql: ${TABLE}.Order_Month ;;
-}
-measure: total_customer {
-  type: sum
-  sql: ${TABLE}.total_customers ;;
-  value_format: "0.00"
+  measure: total_sales {
+    type: sum
+    sql: ${TABLE}.total_sales ;;
+    value_format: "0.00"
+  }
+  dimension: customer_lifetime_value_segmentation {
+    type: string
+    sql: ${TABLE}.customer_lifetime_value_segmentation ;;
+  }
+  measure: sales_per_customer {
+    type: number
+    sql: ${TABLE}.sales_per_customer ;;
+  }
 
-}
-
-measure: total_orders {
-  type: sum
-  sql: ${TABLE}.total_orders ;;
-  value_format: "0.00"
-
-}
-
-measure: total_profit {
-  type: sum
-  sql: ${TABLE}.total_profit ;;
-  value_format: "0.00"
-}
-measure: total_sales {
-  type: sum
-  sql: ${TABLE}.total_sales ;;
-  value_format: "0.00"
-}
-dimension: customer_lifetime_value_segmentation {
-  type: string
-  sql: ${TABLE}.customer_lifetime_value_segmentation ;;
-}
-measure: sales_per_customer {
-  type: number
-  sql: ${TABLE}.sales_per_customer ;;
-}
-
-measure: days_to_ship {
-  type: number
-  sql: ${TABLE}.days_to_ship ;;
-}
+  measure: days_to_ship {
+    type: number
+    sql: ${TABLE}.days_to_ship ;;
+  }
 
   measure: Profit_ratio {
     type: number
@@ -154,31 +160,46 @@ measure: days_to_ship {
     timeframes: [month, month_name, year, date, raw, time, quarter]
     sql: ${TABLE}.sample_order_date ;;
   }
-parameter: Select_timeframe {
-  type: unquoted
-  allowed_value: {
-    value: "Year"
-    label: "year"
+  parameter: Select_timeframe {
+    type: unquoted
+    allowed_value: {
+      value: "Year"
+      label: "year"
+    }
+    allowed_value: {
+      value: "Month"
+      label: "Month"
+    }
+    allowed_value: {
+      value: "Quarter"
+      label: "Quarter"
+    }
   }
-  allowed_value: {
-    value: "Month"
-    label: "Month"
+  parameter: Top_Products {
+    type: unquoted
+    allowed_value: {
+      value: "Top 5"
+      label: "Top5"
+    }
+    allowed_value: {
+      value: "Top 10"
+      label: "Top 10"
+    }
+    allowed_value: {
+      value: "Top 15"
+      label: "Top 15"
+    }
   }
-  allowed_value: {
-    value: "Quarter"
-    label: "Quarter"
+  dimension: order_date {
+    sql:
+      {% if Select_timeframe._parameter_value == 'Year'%}
+      order_year
+      {% elsif Select_timeframe._parameter_value == 'Month'%}
+      order_month
+      {% else %}
+      order_quarter
+      {% endif %};;
   }
-}
-dimension: order_date {
-sql:
-  {% if Select_timeframe._parameter_value == 'Year'%}
-  order_year
-  {% elsif Select_timeframe._parameter_value == 'Month'%}
-  order_month
-  {% else %}
-  order_quarter
-  {% endif %};;
-}
   dimension: sample_ship_date {
     type: date
     datatype: date
@@ -209,6 +230,7 @@ sql:
   dimension: sample_category {
     type: string
     sql: ${TABLE}.sample_category ;;
+    drill_fields: [sample_subcategory, total_profit, total_sales]
   }
 
   dimension: sample_subcategory {
@@ -219,6 +241,37 @@ sql:
   dimension: sample_count {
     type: number
     sql: ${TABLE}.sample_count ;;
+  }
+  measure: Same_period_last_year{
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: previous
+    period: year
+    value_format: "0.00"
+  }
+  measure: Difference_from_last_year{
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: difference
+    period: year
+    value_format: "0.00"
+
+  }
+  measure: Percent_change {
+    type:  period_over_period
+    based_on: total_sales
+    based_on_time: sample_order_date_date
+    kind: relative_change
+    period: year
+    value_format: "0.00%"
+
+  }
+  set: drill {
+    fields: [
+      sample_subcategory,Discount
+    ]
   }
 
   set: detail {
