@@ -3,8 +3,8 @@ view: calculation {
   required_access_grants: [view_calculations]
   derived_table: {
     sql: SELECT
-          (sample.OrderDate ) AS sample_order_date,
-          (sample.ShipDate ) AS sample_ship_date,
+          sample.OrderDate  AS sample_order_date,
+          sample.ShipDate  AS sample_ship_date,
           sample.Sales  AS sample_sales,
           sample.Profit  AS sample_profit,
           sample.CustomerID  AS sample_customer_id,
@@ -61,10 +61,7 @@ view: calculation {
       1 DESC
       ;;
   }
-  dimension: rank {
-    type: number
-    sql: ${TABLE}.rank ;;
-  }
+
   dimension: CustomerName {
     type: string
     sql: ${TABLE}.CustomerName ;;
