@@ -68,6 +68,7 @@ view: calculation {
   }
   dimension: Region {
     type: string
+    required_access_grants: [Region_restrict]
     sql: ${TABLE}.Region ;;
   }
   measure: Discount {
